@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  background: #111;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+.scene {
+  width: 600px;
+  height: 600px;
+  margin: 50px auto;
+  perspective: 1000px;
+}
+
+.grid-container {
+  width: 300px;
+  height: 300px;
+  transform-style: preserve-3d;
+  margin: auto;
+  position: relative;
+  transition: transform 0.1s ease;
+  top: 50%;
+}
+
+
+.plane {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  border: 1px dashed #555;
+  box-sizing: border-box;
+}
+
+.plane-cell {
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+}
+
+.plane.xy {
+  transform: translateZ(0);
+}
+
+.plane.yz {
+  transform: rotateY(90deg) translateX(0);
+  transform-origin: left;
+}
+
+.plane.xz {
+  transform: rotateX(270deg) translateY(0);
+  transform-origin: top;
+}
+
+.cube, .hover-cube {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.hover-cube {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px dashed #fff;
+}
+
+.axis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.voxel {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.cube {
+  position: absolute;
+  transform-style: preserve-3d;
+  width: 100px;
+  height: 100px;
+}
+
+.face {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+}
+
+/* Cada cara posicionada en su lugar */
+.face.front  { transform: translateZ(50px); background-color: rgba(255,0,0,0.2); }
+.face.back   { transform: rotateY(180deg) translateZ(50px); background-color: rgba(0,255,0,0.2); }
+.face.right  { transform: rotateY(90deg) translateZ(50px); background-color: rgba(0,0,255,0.2); }
+.face.left   { transform: rotateY(-90deg) translateZ(50px); background-color: rgba(255,255,0,0.2); }
+.face.top    { transform: rotateX(90deg) translateZ(50px); background-color: rgba(0,255,255,0.2); }
+.face.bottom { transform: rotateX(-90deg) translateZ(50px); background-color: rgba(255,0,255,0.2); }
+
