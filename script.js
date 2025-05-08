@@ -176,7 +176,7 @@ gridContainer.addEventListener('click', (e) => {
   // Verificar si ya existe un cubo en esa posición
   const key = `${x}-${y}-${z}`;
   
-  // Verificar si ya hay un cubo en la posición
+  // Verificar si ya hay un cubo en la posicióna
   if (cubes.includes(key)) {
     return; // No permitir crear un cubo en una posición ocupada
   }
@@ -343,20 +343,20 @@ const createAxis = (axis, length, color, label) => {
   labelEl.style.color = color;
 
   if (axis === 'x') {
-    line.style.width = `${length}px`;
+    line.style.width = `${length * 4}px`;
     line.style.height = '2px';
     line.style.transform = `translate3d(0px, 0px, 0px)`;
-    labelEl.style.transform = `translate3d(${length + 5}px, 0px, 0px)`;
+    labelEl.style.transform = `translate3d(${(length + 5) * 4}px, 0px, 0px)`;
   } else if (axis === 'y') {
-    line.style.height = `${length}px`;
+    line.style.height = `${length * 4}px`;
     line.style.width = '2px';
     line.style.transform = `translate3d(0px, 0px, 0px)`;
-    labelEl.style.transform = `rotateX(180deg) translate3d(0px, ${length - 205}px, 0px)`;
+    labelEl.style.transform = `rotateX(180deg) translate3d(0px, ${(length - 205) * 4}px, 0px)`;
   } else if (axis === 'z') {
-    line.style.width = `${length}px`;
+    line.style.width = `${length * 4}px`;
     line.style.height = '2px';
     line.style.transform = `rotateY(90deg) translate3d(0px, 0px, 0px)`;
-    labelEl.style.transform = `rotateY(0deg) translate3d(${length + 5}px, 0px, 0px)`;
+    labelEl.style.transform = `rotateY(0deg) translate3d(${(length + 5) * 4}px, 0px, 0px)`;
   }
 
   line.appendChild(labelEl);
