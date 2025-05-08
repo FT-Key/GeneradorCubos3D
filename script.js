@@ -1,3 +1,4 @@
+const maxHeight = 3; // Por ejemplo
 const gridContainer = document.getElementById('grid');
 
 const cellSize = 100;
@@ -80,10 +81,16 @@ gridContainer.addEventListener('mousemove', (e) => {
 
     const maxZ = columnCubes.length > 0 ? Math.max(...columnCubes) : -1;
     const nextZ = maxZ + 1;
+    
+    if (nextZ >= maxHeight) {
+      hoverCube.style.display = 'none'; // Ocultar si se superó la altura
+      return;
+    }
+    
 
     // Mostrar solo el hoverCube en esa posición (x, y, nextZ)
     hoverCube.style.display = 'block';
-    hoverCube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(nextZ * cellSize)}px)`;  
+    hoverCube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(nextZ * cellSize)}px)`;
     hoverCube.dataset.x = x;
     hoverCube.dataset.y = y;
     hoverCube.dataset.z = nextZ;
@@ -91,7 +98,6 @@ gridContainer.addEventListener('mousemove', (e) => {
     hoverCube.style.display = 'none';
   }
 });
-
 
 // Colocar cubo fijo al hacer click
 gridContainer.addEventListener('click', (e) => {
@@ -101,9 +107,13 @@ gridContainer.addEventListener('click', (e) => {
   const y = parseInt(hoverCube.dataset.y);
   let z = parseInt(hoverCube.dataset.z);
 
+  if (z >= maxHeight) {
+    return; // No permitir colocar más cubos en esa columna
+  }
+  
   // Verificar si ya existe un cubo en esa posición
   const key = `${x}-${y}-${z}`;
-  
+
   // Verificar si ya hay un cubo en la posición
   if (cubes.includes(key)) {
     return; // No permitir crear un cubo en una posición ocupada
@@ -137,7 +147,7 @@ gridContainer.addEventListener('click', (e) => {
   // Si el cubo ya tiene caras, agregar la lógica de apilamiento
   if (e.target.classList.contains('face')) {
     const clickedFace = getClickedFace(e, cube);
-    
+
     // Dependiendo de la cara clickeada, se incrementa el valor de z para apilar el cubo
     switch (clickedFace) {
       case 'front':
@@ -163,82 +173,16 @@ gridContainer.addEventListener('click', (e) => {
 
   // Actualizar la posición z del cubo cuando el apilamiento está activado
   cube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(z * cellSize + 50)}px)`;
+
+  // Simular movimiento para actualizar el hover después de colocar un cubo
+  const mouseMoveEvent = new MouseEvent('mousemove', {
+    clientX: e.clientX,
+    clientY: e.clientY
+  });
+  gridContainer.dispatchEvent(mouseMoveEvent);
+
 });
 
-// Colocar cubo fijo al hacer click
-gridContainer.addEventListener('click', (e) => {
-  if (!hoverCube.style.display || hoverCube.style.display === 'none') return;
-
-  const x = parseInt(hoverCube.dataset.x);
-  const y = parseInt(hoverCube.dataset.y);
-  let z = parseInt(hoverCube.dataset.z);
-
-  // Verificar si ya existe un cubo en esa posición
-  const key = `${x}-${y}-${z}`;
-  
-  // Verificar si ya hay un cubo en la posicióna
-  if (cubes.includes(key)) {
-    return; // No permitir crear un cubo en una posición ocupada
-  }
-
-  // Verificar si el cubo que queremos colocar tiene un cubo debajo de él (Z-1)
-  if (z > 0) { // Si estamos intentando colocar un cubo en Z > 0
-    const belowKey = `${x}-${y}-${z - 1}`;
-    if (!cubes.includes(belowKey)) {
-      return; // No podemos colocar el cubo sin un cubo debajo
-    }
-  }
-
-  cubes.push(key); // Agregar la posición del cubo
-
-  // Crear nuevo cubo
-  const cube = document.createElement('div');
-  cube.className = 'cube';
-  cube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(z * cellSize / 2)}px)`;
-
-  // Crear caras del cubo
-  const faceNames = ['front', 'back', 'right', 'left', 'top', 'bottom'];
-  for (const name of faceNames) {
-    const face = document.createElement('div');
-    face.className = `face ${name}`;
-    cube.appendChild(face);
-  }
-
-  gridContainer.appendChild(cube);
-
-  // Si el cubo ya tiene caras, agregar la lógica de apilamiento
-  if (e.target.classList.contains('face')) {
-    const clickedFace = getClickedFace(e, cube);
-    
-    // Dependiendo de la cara clickeada, se incrementa el valor de z para apilar el cubo
-    switch (clickedFace) {
-      case 'front':
-        z += 1; // Apilar hacia adelante
-        break;
-      case 'back':
-        z -= 1; // Apilar hacia atrás
-        break;
-      case 'left':
-        z -= 1; // Apilar hacia la izquierda
-        break;
-      case 'right':
-        z += 1; // Apilar hacia la derecha
-        break;
-      case 'top':
-        z += 1; // Apilar hacia arriba
-        break;
-      case 'bottom':
-        z -= 1; // Apilar hacia abajo
-        break;
-    }
-  }
-
-  // Actualizar la posición z del cubo cuando el apilamiento está activado
-  cube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(z * cellSize + 50)}px)`;
-});
-
-
-// Colocar cubo fijo al hacer click
 // Función para detectar la cara clickeada
 const getClickedFace = (event, cubeElement) => {
   const cubeRect = cubeElement.getBoundingClientRect();
@@ -252,85 +196,13 @@ const getClickedFace = (event, cubeElement) => {
 
     // Verificar si el clic ocurrió dentro de la cara
     if (mouseX >= faceRect.left && mouseX <= faceRect.right &&
-        mouseY >= faceRect.top && mouseY <= faceRect.bottom) {
+      mouseY >= faceRect.top && mouseY <= faceRect.bottom) {
       return name; // Retorna el nombre de la cara clickeada
     }
   }
 
   return null; // No se hizo clic en ninguna cara
 };
-
-// Colocar cubo fijo al hacer click
-gridContainer.addEventListener('click', (e) => {
-  if (!hoverCube.style.display || hoverCube.style.display === 'none') return;
-
-  const x = parseInt(hoverCube.dataset.x);
-  const y = parseInt(hoverCube.dataset.y);
-  let z = parseInt(hoverCube.dataset.z);
-
-  // Verificar si ya existe un cubo en esa posición
-  const key = `${x}-${y}-${z}`;
-  
-  // Verificar si ya hay un cubo en la posición
-  if (cubes.includes(key)) {
-    return; // No permitir crear un cubo en una posición ocupada
-  }
-
-  // Verificar si el cubo que queremos colocar tiene un cubo debajo de él (Z-1)
-  if (z > 0) { // Si estamos intentando colocar un cubo en Z > 0
-    const belowKey = `${x}-${y}-${z - 1}`;
-    if (!cubes.includes(belowKey)) {
-      return; // No podemos colocar el cubo sin un cubo debajo
-    }
-  }
-
-  cubes.push(key); // Agregar la posición del cubo
-
-  // Crear nuevo cubo
-  const cube = document.createElement('div');
-  cube.className = 'cube';
-  cube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(z * cellSize / 2)}px)`;
-
-  // Crear caras del cubo
-  const faceNames = ['front', 'back', 'right', 'left', 'top', 'bottom'];
-  for (const name of faceNames) {
-    const face = document.createElement('div');
-    face.className = `face ${name}`;
-    cube.appendChild(face);
-  }
-
-  gridContainer.appendChild(cube);
-
-  // Si el cubo ya tiene caras, agregar la lógica de apilamiento
-  if (e.target.classList.contains('face')) {
-    const clickedFace = getClickedFace(e, cube);
-    
-    // Dependiendo de la cara clickeada, se incrementa el valor de z para apilar el cubo
-    switch (clickedFace) {
-      case 'front':
-        z += 1; // Apilar hacia adelante
-        break;
-      case 'back':
-        z -= 1; // Apilar hacia atrás
-        break;
-      case 'left':
-        z -= 1; // Apilar hacia la izquierda
-        break;
-      case 'right':
-        z += 1; // Apilar hacia la derecha
-        break;
-      case 'top':
-        z += 1; // Apilar hacia arriba
-        break;
-      case 'bottom':
-        z -= 1; // Apilar hacia abajo
-        break;
-    }
-  }
-
-  // Actualizar la posición z del cubo cuando el apilamiento está activado
-  cube.style.transform = `translate3d(${x * cellSize}px, ${y * cellSize}px, ${-(z * cellSize + 50)}px)`;
-});
 
 const createAxis = (axis, length, color, label) => {
   const line = document.createElement('div');
@@ -380,6 +252,7 @@ gridContainer.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}de
 gridContainer.addEventListener('mousedown', (e) => {
   isDragging = true;
   lastX = e.clientX;
+  console.log("LastX: ", lastX)
   lastY = e.clientY;
 });
 
@@ -396,8 +269,8 @@ document.addEventListener('mousemove', (e) => {
   const deltaY = e.clientY - lastY;
 
   // Ajustar sensibilidad si querés
-  rotationY += deltaX * 0.5;
-  rotationX += deltaY * 0.5;
+  rotationY -= deltaX * 0.5;
+  rotationX -= deltaY * 0.5;
 
   // Limitar rotación X para que no se voltee del todo si no querés
   rotationX = Math.max(90, Math.min(270, rotationX)); // evita que Y se invierta
